@@ -20,4 +20,5 @@ model1 <-'
 fit1 <- sem(model1, data= sal)         
 summary(fit1, standardize = TRUE)         
 fitMeasures(fit1, c("cfi", "rmsea", "srmr"))
+
 semPaths(fit1, what="paths", whatLabels="stand", rotation=1)
