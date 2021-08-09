@@ -1,0 +1,206 @@
+#PAPER TITLE
+#AUTHORS NAMES
+#In this script, we test normality of the pretest data using visual methods and the Shapiro-Wilk test
+#After testing normality, we use evaluate mean differenes throught visual methods first and then the Kruskal-Wallis test (Post-hoc: Dunn's Test)
+#This code was created using R version 4.1 and it's likely to break if previous versions are used to run it
+
+
+
+
+#Packages installation and loading
+if(!require(rcompanion)){install.packages("rcompanion")}
+if(!require(tidyverse)){install.packages("tidyverse")}
+if(!require(sjPlot)){install.packages("sjPlot")}
+if(!require(sjmisc)){install.packages("sjmisc")}
+
+
+library("rcompanion")
+library("tidyverse")
+library(sjPlot)
+library(sjmisc)
+library(data.table)
+
+
+#Data upload
+sheep_data <- read.csv("Study2_GScores.csv")
+
+#Note: Subjects are American.
+#USA: Represent the victims' nationality. In this case, ingroup victims
+#AU: In this case, are outgroup victims.
+
+
+#1. Normality test
+
+#a. Density plots for the different groups/cells - individual graphs: Greed Score
+ggplot(sheep_data, 
+       aes(GreedScore)) +
+       ggtitle("Density Plots Greed Scores by Group") +
+       theme(plot.title= element_text(hjust = 0.5)) +
+       geom_density(fill="green", alpha =.3) + 
+       labs (x= "Greed Score") + 
+       geom_vline(xintercept = 40, color= "blue", linetype = "dashed") + 
+       facet_grid(. ~ Group)
+
+#a2. Nation identification density plot per victimized group (USA vs AU)
+ggplot(sheep_data, 
+       aes(IdScore)) +
+       ggtitle("Density Plot National Identification per Victimized Group") +
+       theme(plot.title= element_text(hjust = 0.5)) +
+       geom_density(fill="green", alpha =.3) + 
+       labs (x= "Identification Score") +
+       geom_vline(xintercept = 30, color= "blue", linetype = "dashed") + 
+       facet_grid(. ~ Group)
+
+
+# b. Density plots for the different groups - single graph: Greed Scores
+
+#Plot
+ggplot(sheep_data, 
+       aes(GreedScore, fill= Group)) +
+       ggtitle("Density Plot Scores by Group") +
+       geom_density(alpha =.6) + 
+       labs (x= "Greed Score") + 
+       geom_vline(xintercept = 40, color= "blue", linetype = "dashed") + 
+       theme_dark() + 
+       theme(plot.title = element_text(hjust = 0.5)) 
+
+#b2. Nation Identification plot
+ggplot(sheep_data, 
+       aes(IdScore, fill= Group)) +
+       ggtitle("Nation Identification Scores by Victimized Group") +
+       geom_density(alpha =.6) + 
+       labs (x= "Identification Score") + 
+       geom_vline(xintercept = 40, color= "blue", linetype = "dashed") + 
+       theme_dark() + 
+       theme(plot.title = element_text(hjust = 0.5)) 
+
+#c. q plot - single graphs: Greed Score
+qplot(sample = GreedScore, 
+      data= sheep_data, 
+      shape=Group, 
+      color= Group) + 
+      labs(y= "Greed Score")
+
+#c2. q plot: Nation Identification
+qplot(sample = IdScore, 
+      data= sheep_data, 
+      shape=Group, 
+      color= Group) + 
+      labs(y= "Identification Score")
+
+#Shapiro-Wilk test
+
+#d. Summary stats per group: Greed Scores
+tapply(sheep_data$GreedScore, 
+       sheep_data$Group, 
+       summary)
+
+#d2. Summary stats per group: Nation Identification
+tapply(sheep_data$IdScore, 
+       sheep_data$Group, 
+       summary)
+
+#e.Shapiro-Wilk tests by group: Greed Score
+#Data frame transform, drop unneccesary variables, reorganize data
+sheep_data2 <- subset(sheep_data, 
+                      select =c(GreedScore, Group))
+Dat <- data.table(sheep_data2)
+
+#Test
+Dat[,
+    .(W = shapiro.test(GreedScore)$statistic, 
+      P.value = shapiro.test(GreedScore)$p.value),
+    by = .(Group)]
+
+#d2. Summary stats per group: Nation Identification
+tapply(sheep_data$IdScore, 
+       sheep_data$Group, 
+       summary)
+
+#e.Shapiro-Wilk tests by group: Nation Identification
+#Data frame transform, drop unneccesary variables, reorganize data
+sheep_data3 <- subset(sheep_data, 
+                      select =c(IdScore, Group))
+Dat <- data.table(sheep_data3)
+
+#Test
+Dat[,
+    .(W = shapiro.test(IdScore)$statistic, 
+      P.value = shapiro.test(IdScore)$p.value),
+    by = .(Group)]
+
+#2.Group differences 
+
+#a. Greed Scores per Group
+#Visualization
+
+#2. Mean differences
+
+#a. Summary stats per group
+tapply(sheep_data$GreedScore, 
+       sheep_data$Group, 
+       summary)
+
+
+#b. Visualization, box plots
+ggboxplot(sheep_data, 
+          x = "Group", 
+          y = "GreedScore", 
+          color = "Group", 
+          palette = c("#00AFBB", "#E7B800"),
+          order = c("AU", "USA"),
+          ylab = "Greed Score", 
+          xlab = "Victims nationality",
+          title = "Greed scores box plots")
+                                           
+
+#Mean Plots: Greed Score
+
+#Zoomed-in plot: means line
+ggline(sheep_data, 
+       x = "Group", 
+       y = "GreedScore", 
+       add = c("mean_se", "jitter"), 
+       order = c("AU", "USA"),
+       ylab = "Greed Score", 
+       xlab = "Victims nationality",
+       title = "Greed data score: points and means",
+       ylim = c(35,56)
+       )
+
+#Zoomed-out plot: no means line. Grouping colors 
+ggline(sheep_data, 
+       x = "Group", 
+       y = "GreedScore", 
+       add = c("mean_se", "jitter"), 
+       order = c("AU", "USA"),
+       ylab = "Greed Score", 
+       xlab = "Victims nationality",
+       title = "Greed data score: points and means",
+       color = "Group"
+       )
+
+#Test: -Mann-Whitney U Test, or Wilcoxon rank sum test: Greed Scores
+wilcox.test(GreedScore ~ Group, data=sheep_data)
+
+#b. Nation Identification Scores per Group
+
+#
+tapply(sheep_data$IdScore, 
+       sheep_data$Group, 
+       summary)
+
+#Plot
+ggboxplot(sheep_data, 
+          x = "Group", 
+          y = "IdScore", 
+          color = "Group", 
+          palette = c("#00AFBB", "#E7B800"),
+          order = c("AU", "USA"),
+          ylab = "Greed Score", 
+          xlab = "Victims nationality",
+          title = "Identification scores box plots")
+
+
+#Test: -Mann-Whitney U Test, or Wilcoxon rank sum test
+wilcox.test(IdScore ~ Group, data=sheep_data)

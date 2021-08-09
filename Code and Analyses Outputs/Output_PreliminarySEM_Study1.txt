@@ -1,0 +1,229 @@
+#Data frame transform
+> n_data <- sem_data[c("Dir1", "Dir2", "Dir3", "Dir4", "Ind1", "Ind2", "Ind3", "Ind4")]
+> #a. Multivariate normality test - Default: Henze-Zirkler's test  
+> mvn(n_data)
+$multivariateNormality
+           Test       HZ p value MVN
+1 Henze-Zirkler 41.43221       0  NO
+
+$univariateNormality
+              Test  Variable Statistic   p value Normality
+1 Anderson-Darling   Dir1      61.1248  <0.001      NO    
+2 Anderson-Darling   Dir2      57.9632  <0.001      NO    
+3 Anderson-Darling   Dir3      49.9153  <0.001      NO    
+4 Anderson-Darling   Dir4      72.1320  <0.001      NO    
+5 Anderson-Darling   Ind1      78.3425  <0.001      NO    
+6 Anderson-Darling   Ind2      74.3423  <0.001      NO    
+7 Anderson-Darling   Ind3      34.9136  <0.001      NO    
+8 Anderson-Darling   Ind4      49.3167  <0.001      NO    
+
+$Descriptives
+       n     Mean   Std.Dev Median Min Max 25th 75th      Skew  Kurtosis
+Dir1 496 6.481855 0.7545642      7   2   7    6    7 -1.839123  5.290167
+Dir2 496 6.427419 0.8708374      7   2   7    6    7 -2.241023  6.959597
+Dir3 496 6.381048 0.7771768      7   2   7    6    7 -1.547138  3.637831
+Dir4 496 6.185484 1.4205814      7   1   7    6    7 -2.383388  5.245468
+Ind1 496 6.584677 0.7842432      7   1   7    6    7 -3.064451 14.301758
+Ind2 496 6.493952 0.9618814      7   1   7    6    7 -3.061614 11.680589
+Ind3 496 5.852823 1.3679270      6   1   7    5    7 -1.260581  1.121635
+Ind4 496 6.203629 1.1031941      7   1   7    6    7 -1.668620  2.990980
+
+> #a. Measurement model specification for sem lavaan function
+> sem_model <-' 
++           #Measurement model
++               Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
++               Equality =~ Eq1 + Eq2
++               Need =~ N1 + N2
++               Equity =~ Des1 + Des2
++               Depriv =~ Dep1 + Dep2 
++               Blame =~ Bla1 + Bla2 + Bla3
++            
++            #Regression
++               Greed ~ Equality + Need + Equity + Depriv + Blame
++            
++            '
+> #b. SEM analysis - Satorra Bentler chi Square and robust standard errors
+> fit2 = sem(sem_model, 
++            data = sem_data, 
++            auto.var=TRUE, 
++            estimator = "MLM", 
++            se="robust")
+> #Summary including fit measures, standardized values and rquare.
+> summary(fit2, 
++         fit.measures=TRUE, 
++         standardize=TRUE,
++         rsquare=TRUE)
+lavaan 0.6-9 ended normally after 55 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        53
+                                                      
+  Number of observations                           496
+                                                      
+Model Test User Model:
+                                              Standard      Robust
+  Test Statistic                               416.640     209.685
+  Degrees of freedom                               137         137
+  P-value (Chi-square)                           0.000       0.000
+  Scaling correction factor                                  1.987
+       Satorra-Bentler correction                                 
+
+Model Test Baseline Model:
+
+  Test statistic                              4400.045    1856.069
+  Degrees of freedom                               171         171
+  P-value                                        0.000       0.000
+  Scaling correction factor                                  2.371
+
+User Model versus Baseline Model:
+
+  Comparative Fit Index (CFI)                    0.934       0.957
+  Tucker-Lewis Index (TLI)                       0.917       0.946
+                                                                  
+  Robust Comparative Fit Index (CFI)                         0.964
+  Robust Tucker-Lewis Index (TLI)                            0.955
+
+Loglikelihood and Information Criteria:
+
+  Loglikelihood user model (H0)             -11872.875  -11872.875
+  Loglikelihood unrestricted model (H1)     -11664.555  -11664.555
+                                                                  
+  Akaike (AIC)                               23851.749   23851.749
+  Bayesian (BIC)                             24074.698   24074.698
+  Sample-size adjusted Bayesian (BIC)        23906.474   23906.474
+
+Root Mean Square Error of Approximation:
+
+  RMSEA                                          0.064       0.033
+  90 Percent confidence interval - lower         0.057       0.026
+  90 Percent confidence interval - upper         0.071       0.039
+  P-value RMSEA <= 0.05                          0.001       1.000
+                                                                  
+  Robust RMSEA                                               0.046
+  90 Percent confidence interval - lower                     0.033
+  90 Percent confidence interval - upper                     0.058
+
+Standardized Root Mean Square Residual:
+
+  SRMR                                           0.041       0.041
+
+Parameter Estimates:
+
+  Standard errors                           Robust.sem
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(>|z|)   Std.lv  Std.all
+  Greed =~                                                              
+    Dir1              1.000                               0.601    0.798
+    Dir2              1.158    0.089   12.988    0.000    0.696    0.800
+    Dir3              0.738    0.100    7.418    0.000    0.444    0.572
+    Dir4              1.005    0.119    8.419    0.000    0.604    0.426
+    Ind1              0.921    0.071   12.891    0.000    0.554    0.707
+    Ind2              0.936    0.112    8.388    0.000    0.563    0.586
+    Ind3              1.399    0.121   11.546    0.000    0.841    0.615
+    Ind4              1.345    0.116   11.596    0.000    0.809    0.734
+  Equality =~                                                           
+    Eq1               1.000                               1.160    0.925
+    Eq2               0.934    0.065   14.368    0.000    1.083    0.774
+  Need =~                                                               
+    N1                1.000                               0.970    0.668
+    N2                0.832    0.070   11.853    0.000    0.808    0.813
+  Equity =~                                                             
+    Des1              1.000                               0.752    0.732
+    Des2              1.252    0.089   14.079    0.000    0.941    0.814
+  Depriv =~                                                             
+    Dep1              1.000                               0.696    0.771
+    Dep2              1.218    0.109   11.210    0.000    0.848    0.828
+  Blame =~                                                              
+    Bla1              1.000                               0.644    0.529
+    Bla2              1.146    0.151    7.594    0.000    0.737    0.738
+    Bla3              1.005    0.144    6.965    0.000    0.647    0.662
+
+Regressions:
+                   Estimate  Std.Err  z-value  P(>|z|)   Std.lv  Std.all
+  Greed ~                                                               
+    Equality          0.066    0.039    1.663    0.096    0.127    0.127
+    Need              0.308    0.096    3.224    0.001    0.497    0.497
+    Equity            0.245    0.107    2.287    0.022    0.306    0.306
+    Depriv            0.067    0.110    0.612    0.540    0.078    0.078
+    Blame             0.004    0.086    0.050    0.960    0.005    0.005
+
+Covariances:
+                   Estimate  Std.Err  z-value  P(>|z|)   Std.lv  Std.all
+  Equality ~~                                                           
+    Need              0.484    0.073    6.628    0.000    0.430    0.430
+    Equity            0.565    0.089    6.352    0.000    0.648    0.648
+    Depriv            0.362    0.054    6.657    0.000    0.449    0.449
+    Blame             0.332    0.083    3.995    0.000    0.445    0.445
+  Need ~~                                                               
+    Equity            0.531    0.073    7.276    0.000    0.729    0.729
+    Depriv            0.504    0.075    6.742    0.000    0.747    0.747
+    Blame             0.415    0.072    5.749    0.000    0.665    0.665
+  Equity ~~                                                             
+    Depriv            0.387    0.067    5.737    0.000    0.740    0.740
+    Blame             0.347    0.081    4.263    0.000    0.717    0.717
+  Depriv ~~                                                             
+    Blame             0.304    0.057    5.307    0.000    0.679    0.679
+
+Variances:
+                   Estimate  Std.Err  z-value  P(>|z|)   Std.lv  Std.all
+   .Dir1              0.207    0.031    6.754    0.000    0.207    0.364
+   .Dir2              0.272    0.044    6.244    0.000    0.272    0.360
+   .Dir3              0.406    0.051    7.966    0.000    0.406    0.673
+   .Dir4              1.649    0.254    6.499    0.000    1.649    0.819
+   .Ind1              0.307    0.080    3.855    0.000    0.307    0.500
+   .Ind2              0.606    0.136    4.464    0.000    0.606    0.657
+   .Ind3              1.160    0.140    8.275    0.000    1.160    0.621
+   .Ind4              0.561    0.097    5.774    0.000    0.561    0.462
+   .Eq1               0.227    0.106    2.147    0.032    0.227    0.145
+   .Eq2               0.783    0.170    4.592    0.000    0.783    0.400
+   .N1                1.167    0.192    6.080    0.000    1.167    0.553
+   .N2                0.335    0.079    4.249    0.000    0.335    0.339
+   .Des1              0.491    0.130    3.762    0.000    0.491    0.465
+   .Des2              0.451    0.118    3.823    0.000    0.451    0.337
+   .Dep1              0.330    0.077    4.280    0.000    0.330    0.405
+   .Dep2              0.329    0.077    4.285    0.000    0.329    0.314
+   .Bla1              1.064    0.214    4.968    0.000    1.064    0.720
+   .Bla2              0.454    0.111    4.080    0.000    0.454    0.455
+   .Bla3              0.536    0.146    3.662    0.000    0.536    0.562
+   .Greed             0.073    0.017    4.210    0.000    0.203    0.203
+    Equality          1.345    0.168    8.013    0.000    1.000    1.000
+    Need              0.941    0.131    7.210    0.000    1.000    1.000
+    Equity            0.565    0.108    5.237    0.000    1.000    1.000
+    Depriv            0.485    0.093    5.222    0.000    1.000    1.000
+    Blame             0.414    0.113    3.664    0.000    1.000    1.000
+
+R-Square:
+                   Estimate
+    Dir1              0.636
+    Dir2              0.640
+    Dir3              0.327
+    Dir4              0.181
+    Ind1              0.500
+    Ind2              0.343
+    Ind3              0.379
+    Ind4              0.538
+    Eq1               0.855
+    Eq2               0.600
+    N1                0.447
+    N2                0.661
+    Des1              0.535
+    Des2              0.663
+    Dep1              0.595
+    Dep2              0.686
+    Bla1              0.280
+    Bla2              0.545
+    Bla3              0.438
+    Greed             0.797
+
+> #reliability values
+> reliability(fit2)
+           Greed  Equality      Need    Equity    Depriv     Blame
+alpha  0.8277341 0.8318252 0.6722986 0.7433037 0.7759187 0.6636203
+omega  0.8348783 0.8327941 0.6779663 0.7527315 0.7835084 0.6668301
+omega2 0.8348783 0.8327941 0.6779663 0.7527315 0.7835084 0.6668301
+omega3 0.8416182 0.8327939 0.6779665 0.7527314 0.7835085 0.6682987
+avevar 0.3963184 0.7137313 0.5149004 0.6064786 0.6462790 0.4011633

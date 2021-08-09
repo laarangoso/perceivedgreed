@@ -1,0 +1,130 @@
+#PAPER TITLE
+#AUTHORS NAMES
+#In this script, we test normality of the pretest data using visual methods and the Shapiro-Wilk test
+#After testing normality, we use evaluate mean differenes throught visual methods first and then the Kruskal-Wallis test (Post-hoc: Dunn's Test)
+#This code was created using R version 4.1 and it's likely to break if previous versions are used to run it
+
+
+#Packages installation and loading
+if(!require(rcompanion)){install.packages("rcompanion")}
+if(!require(tidyverse)){install.packages("tidyverse")}
+if(!require(sjPlot)){install.packages("sjPlot")}
+if(!require(sjmisc)){install.packages("sjmisc")}
+
+
+library("rcompanion")
+library("tidyverse")
+library(sjPlot)
+library(sjmisc)
+library(data.table)
+
+
+#Data upload
+freq_data <- read.csv("Study3_GScores.csv")
+
+
+#1. Normality test
+
+#a. Density plots for the different groups/cells - individual graphs: Greed Score
+ggplot(freq_data, 
+       aes(GreedScore)) +
+       ggtitle("Density Plots Greed Scores by Behavior Frequency") +
+       theme(plot.title= element_text(hjust = 0.5)) +
+       geom_density(fill="green", alpha =.3) + 
+       labs (x= "Greed Score") + 
+       geom_vline(xintercept = 40, color= "blue", linetype = "dashed") + 
+       facet_grid(. ~ Group)
+
+
+# b. Density plots for the different groups - single graph: Greed Scores
+
+#Plot
+ggplot(freq_data, 
+       aes(GreedScore, fill= Group)) +
+       ggtitle("Density Plot Scores by Behavior Frequency") +
+       geom_density(alpha =.6) + 
+       labs (x= "Greed Score") + 
+       geom_vline(xintercept = 40, color= "blue", linetype = "dashed") + 
+       theme_dark() + 
+       theme(plot.title = element_text(hjust = 0.5)) 
+
+#c. q plot - single graphs: Greed Score
+qplot(sample = GreedScore, 
+      data= freq_data, 
+      shape=Group, 
+      color= Group) + 
+      labs(y= "Greed Score")
+
+#Shapiro-Wilk test
+
+#d. Summary stats per group: Greed Scores
+tapply(freq_data$GreedScore, 
+       freq_data$Group, 
+       summary)
+
+
+#e.Shapiro-Wilk tests by group: Greed Score
+#Data frame transform, drop unneccesary variables, reorganize data
+
+Dat <- data.table(freq_data)
+
+#Test
+Dat[,
+    .(W = shapiro.test(GreedScore)$statistic, 
+      P.value = shapiro.test(GreedScore)$p.value),
+    by = .(Group)]
+
+
+#2.Group differences 
+
+#a. Greed Scores per Group
+#Visualization
+
+#2. Mean differences
+
+#a. Summary stats per group
+tapply(freq_data$GreedScore, 
+       freq_data$Group, 
+       summary)
+
+
+#b. Visualization, box plots
+ggboxplot(freq_data, 
+          x = "Group", 
+          y = "GreedScore", 
+          color = "Group", 
+          palette = c("#00AFBB", "#E7B800"),
+          order = c("Common", "Rare"),
+          ylab = "Greed Score", 
+          xlab = "Frequency of behavior",
+          title = "Greed scores box plots")
+
+
+#Mean Plots: Greed Score
+
+#Zoomed-in plot: means line
+ggline(freq_data, 
+       x = "Group", 
+       y = "GreedScore", 
+       add = c("mean_se", "jitter"), 
+       order = c("Common", "Rare"),
+       ylab = "Greed Score", 
+       xlab = "Frequency of Behavior",
+       title = "Greed data score: points and means",
+       ylim = c(35,56)
+       )
+
+#Zoomed-out plot: no means line. Grouping colors 
+ggline(freq_data, 
+       x = "Group", 
+       y = "GreedScore", 
+       add = c("mean_se", "jitter"), 
+       order = c("Common", "Rare"),
+       ylab = "Greed Score", 
+       xlab = "Frequency of Behavor",
+       title = "Greed data score: points and means",
+       color = "Group"
+       )
+
+#Test: -Mann-Whitney U Test, or Wilcoxon rank sum test: Greed Scores
+wilcox.test(GreedScore ~ Group, data=freq_data)

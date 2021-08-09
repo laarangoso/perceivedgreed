@@ -1,0 +1,512 @@
+geom_density(alpha =.6) + labs (x=
+"Greed Score") + geom_vline(xintercept = 40, color=
+"blue", linetype = "dashed") + theme_dark()
+ggplot(my_data2, aes(Score, fill= Group, Size))) +
+geom_density(alpha =.6) + labs (x=
+"Greed Score") + geom_vline(xintercept = 40, color=
+"blue", linetype = "dashed") + theme_dark()
+# b. Density plots for the different groups - single graph
+#Data transform
+my_data3<- transform(my_data2, GroupandSize= paste(Group, Size))
+#Plot
+ggplot(my_data3, aes(Score, fill= GroupandSize)) +
+geom_density(alpha =.6) + labs (x=
+"Greed Score") + geom_vline(xintercept = 40, color=
+"blue", linetype = "dashed") + theme_dark()
+geom_density(alpha =.6) +
+labs (x= "Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+theme_dark()
+geom_density(alpha =.6) +
+labs (x= "Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+theme_dark()
+#Plot
+ggplot(my_data3, aes(Score, fill= GroupandSize)) +
+ggtitle("Density Plot Scores by Group") +
+theme(plot.title = element_text(hjust = 0.5)) +
+geom_density(alpha =.6) +
+labs (x= "Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+theme_dark()
+#Plot
+ggplot(my_data3, aes(Score, fill= GroupandSize)) +
+ggtitle("Density Plot Scores by Group") +
+theme(plot.title = element_text(hjust = 0.8)) +
+geom_density(alpha =.6) +
+labs (x= "Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+theme_dark()
+#Plot
+ggplot(my_data3, aes(Score, fill= GroupandSize)) +
+theme(plot.title = element_text(hjust = 0.5)) +
+ggtitle("Density Plot Scores by Group") +
+geom_density(alpha =.6) +
+labs (x= "Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+theme_dark()
+#Plot
+ggplot(my_data3, aes(Score, fill= GroupandSize)) +
+ggtitle("Density Plot Scores by Group") +
+geom_density(alpha =.6) +
+labs (x= "Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+theme_dark() +
+theme(plot.title = element_text(hjust = 0.5))
+# b. Density plots for the different groups - single graph
+ggplot(my_data, aes(Greed_Score, fill= Scenario)) +
+ggtitle("Density Plot Greed Scores by Scenario") +
+geom_density(alpha =.6) +
+labs (x= "Total Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+theme_dark() +
+theme(plot.title = element_text(hjust = 0.5))
+#c. q plot - single graphs
+qplot(sample = Score, data= my_data3, shape=GroupandSize, color= GroupandSize) +
+labs(y= "Greed Score")
+#d. Summary stats per group
+tapply(my_data3$Score, my_data3$GroupandSize, summary)
+#Shapiro-Wilk tests by group
+#Data frame transform, drop unnecesary variables
+my_data4 <- subset(my_data3, select =c(Score, GroupandSize))
+Dat <- data.table(my_data4)
+Dat[,
+.(W = shapiro.test(Score)$statistic,
+P.value = shapiro.test(Score)$p.value),
+by = .(GroupandSize)]
+#a.Test p Values
+scheirerRayHare(Score ~ Group + Size,
+data=my_data2)
+interaction.plot(my_data2$Size,
+my_data2$Group,
+my_data2$Score,
+xlab= "Company Size",
+ylab= "Greed Score",
+main = "Greed Score
+interaction plot",
+ylim = c(47, 53),
+trace.label=" Group",
+col =c("red", "green"))
+interaction.plot(my_data2$Size,
+my_data2$Group,
+my_data2$Score,
+xlab= "Company Size",
+ylab= "Greed Score",
+main = "Greed Score Interaction Plot",
+ylim = c(47, 53),
+trace.label=" Group",
+col =c("red", "green")),
+theme(plot.title = element_text(hjust = 0.5))
+interaction.plot(my_data2$Size,
+my_data2$Group,
+my_data2$Score,
+xlab= "Company Size",
+ylab= "Greed Score",
+main = "Greed Score Interaction Plot",
+ylim = c(47, 53),
+trace.label=" Group",
+col =c("red", "green")) +
+theme(plot.title = element_text(hjust = 0.5))
+#Packages installation and loading
+if(!require(rcompanion)){install.packages("rcompanion")}
+if(!require(tidyverse)){install.packages("tidyverse")}
+library("rcompation")
+library("tidyverse")
+library(data.table)
+#Data upload
+my_data2 <- read.csv("MainGreedScores.csv")
+#a. Density plots for the different groups/cells - individual graphs
+ggplot(my_data2, aes(Score)) +
+ggtitle("Density Plots Greed Scores by Group") +
+theme(plot.title= element_text(hjust = 0.5)) +
+geom_density(fill="green", alpha =.3) +
+labs (x= "Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+facet_grid(. ~ Group + Size)
+# b. Density plots for the different groups - single graph
+#Data frame introduce new variable
+my_data3<- transform(my_data2, GroupandSize= paste(Group, Size))
+#Plot
+ggplot(my_data3, aes(Score, fill= GroupandSize)) +
+ggtitle("Density Plot Scores by Group") +
+geom_density(alpha =.6) +
+labs (x= "Greed Score") +
+geom_vline(xintercept = 40, color= "blue", linetype = "dashed") +
+theme_dark() +
+theme(plot.title = element_text(hjust = 0.5))
+#c. q plot - single graphs
+qplot(sample = Score, data= my_data3, shape=GroupandSize, color= GroupandSize) +
+labs(y= "Greed Score")
+#d. Summary stats per group
+tapply(my_data3$Score, my_data3$GroupandSize, summary)
+#e.Shapiro-Wilk tests by group
+#Data frame transform, drop unneccesary variables, reorganize data
+my_data4 <- subset(my_data3, select =c(Score, GroupandSize))
+Dat <- data.table(my_data4)
+#Test
+Dat[,
+.(W = shapiro.test(Score)$statistic,
+P.value = shapiro.test(Score)$p.value),
+by = .(GroupandSize)]
+#a.Test p Values
+scheirerRayHare(Score ~ Group + Size,
+data=my_data2)
+#b. Interaction Plot
+#The following line of code might be necessary if the axis of the plot are only partially visible
+dev.off()
+#Plot
+interaction.plot(my_data2$Size,
+my_data2$Group,
+my_data2$Score,
+xlab= "Company Size",
+ylab= "Greed Score",
+main = "Greed Score Interaction Plot",
+ylim = c(47, 53),
+trace.label=" Group",
+col =c("red", "green")) +
+theme(plot.title = element_text(hjust = 0.5))
+sal <- read.csv("Small_Local.csv")
+install.packages("lavaan")
+install.packages("semPlot")
+install.packages("stringi")
+library(lavaan)
+library(semPlot)
+library(stringi)
+str(sal)
+model1 <-'
+#measurement model
+greed =~Dir2 + Dir 3 + Dir4
+'
+fit1 <- sem(model1, data= sal)
+summary(fit1, standardize = TRUE)
+fitMeasures(fit1, c("cfi", "rmsea", "srmr"))
+semPaths(fit1, what="paths", whatLabels="stand", rotation=1)
+install.packages("Rccp")
+install.packages("Rcpp")
+install.packages("Rcpp")
+library(rcpp)
+library(Rcpp)
+str(sal)
+model1 <-'
+#measurement model
+greed =~Dir2 + Dir 3 + Dir4
+'
+fit1 <- sem(model1, data= sal)
+summary(fit1, standardize = TRUE)
+fitMeasures(fit1, c("cfi", "rmsea", "srmr"))
+semPaths(fit1, what="paths", whatLabels="stand", rotation=1)
+install.packages("Rtools")
+install.packages("Rcpp")
+install.packages("Rcpp")
+library(lavaan)
+library(semPlot)
+library(stringi)
+library(Rcpp)
+str(sal)
+model1 <-'
+#measurement model
+greed =~Dir2 + Dir 3 + Dir4
+'
+fit1 <- sem(model1, data= sal)
+summary(fit1, standardize = TRUE)
+fitMeasures(fit1, c("cfi", "rmsea", "srmr"))
+semPaths(fit1, what="paths", whatLabels="stand", rotation=1)
+library(lavaan)
+library(semPlot)
+library(stringi)
+library(Rcpp)
+sem_data <- read.csv("Complete Data, Reversed.csv")
+sem_data
+fit = cfa(m_model, data = sem_data)
+m_model <- '
+#Define latent variables and indicators
+greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit = cfa(m_model, data = sem_data)
+fit = cfa(m_model, data = sem_data)
+fit = cfa(m_model, data = sem_data)
+str(sem_data)
+fit = cfa(m_model, data = sem_data)
+str(sem_data$Dep.2)
+m_model <- '
+#Define latent variables and indicators
+greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep 2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+str(sem_data)
+fit = cfa(m_model, data = sem_data)
+m_model <- '
+#Define latent variables and indicators
+greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep.2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit = cfa(m_model, data = sem_data)
+sem_data <- read.csv("Complete Data, Reversed.csv")
+m_model <- '
+#Define latent variables and indicators
+greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit = cfa(m_model, data = sem_data)
+?cfa
+fit = cfa(m_model, data = sem_data, estimator = "MRL")
+fit = cfa(m_model, data = sem_data, estimator = "MR")
+fit = cfa(m_model, data = sem_data, "MLR" = TRUE)
+fit = cfa(m_model, data = sem_data, estimator = "ML")
+fit = cfa(m_model, data = sem_data, estimator = "MLR")
+summary(fit, fit.measures=TRUE)
+fit = cfa(m_model, data = sem_data, bootstrap = 10000, estimator = "MLR")
+summary(fit, fit.measures=TRUE)
+semPaths(fit, what="paths", whatLabels="stand", rotation=1)
+semPaths(fit,"std",layout = 'tree', edge.label.cex=.9, curvePivot = TRUE)
+semPaths(fit,"std",layout = 'circle', edge.label.cex=.9, curvePivot = TRUE)
+?lavaan
+?lavaan
+m_model <- '
+#Define latent variables and indicators
+Greed <~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit = cfa(m_model, data = sem_data, bootstrap = 10000, estimator = "MLR")
+sem_data <- read.csv("Complete Data, Reversed.csv")
+m_model <- '
+#Define latent variables and indicators
+Greed <~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit = cfa(m_model, data = sem_data, bootstrap = 10000, estimator = "MLR")
+m_model <- '
+#Define latent variables and indicators
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit = cfa(m_model, data = sem_data, bootstrap = 10000, estimator = "MLR")
+fit = cfa(m_model, data = sem_data, estimator = "MLM", se= "robust")
+summary(fit, fit.measures=TRUE)
+m_model <- '
+#Define latent variables and indicators
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame <~ Bladir1 + Bladir2 + Bladir3
+'
+fit1 = cfa(m_model, data = sem_data, estimator = "MLM", se= "robust")
+fit2 = cfa(m_model, data = sem_data, test = "bollen.stine", se= "bootstrap")
+summary(fit2, fit.measures = TRUE)
+fit1 = cfa(m_model, data = sem_data, estimator = "MLR")
+fit1 = cfa(m_model, data = sem_data, estimator = "MLR", se= "robust")
+m_model <- '
+#Define latent variables and indicators
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit1 = cfa(m_model, data = sem_data, estimator = "MLR", se= "robust")
+summary(fit1, fit.measures = TRUE)
+fit1 = cfa(m_model, data = sem_data, estimator = "MLR")
+summary(fit1, fit.measures = TRUE)
+fit1 = cfa(m_model, data = sem_data, estimator = "MLM", se = "robust")
+summary(fit1, fit.measures = TRUE)
+path_model <-'
+#measurement model
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+#Regressions
+Greed ~ Equality + Need + Equity + Deprivation + Blame
+#Variances exogenous variables
+Equality~~Equality
+Need~~Need
+Equity~~Equity
+Deprivation~~Deprivation
+Blame~~Blame
+#Covariances exogenous variables
+Equality~~Need + Equity + Deprivation + Blame
+Need~~Equity + Deprivation + Blame
+Equity~~Deprivation + Blame
+Deprivation~~Blame
+'
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLM", se = "robust")
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLM", se = "robust")
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLM", se = "robust", auto.var = TRUE)
+path_model <-'
+#measurement model
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+#Regressions
+Greed ~ Equality + Need + Equity + Deprivation + Blame
+#Variances exogenous variables
+Equality~~Equality
+Need~~Need
+Equity~~Equity
+Deprivation~~Deprivation
+Blame~~Blame
+#Covariances exogenous variables
+Equality~~Need + Equity + Deprivation + Blame
+Need~~Equity + Deprivation + Blame
+Equity~~Deprivation + Blame
+Deprivation~~Blame
+'
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLM", se = "robust", auto.var = TRUE)
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLM", auto.var = TRUE)
+path_model <-'
+#measurement model
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+#Regressions
+Greed ~ Equality + Need + Equity + Deprivation + Blame
+#Variances exogenous variables
+Equality~~Equality
+Need~~Need
+Equity~~Equity
+Deprivation~~Deprivation
+Blame~~Blame
+#Covariances exogenous variables
+Equality~~Need + Equity + Deprivation + Blame
+Need~~Equity + Deprivation + Blame
+Equity~~Deprivation + Blame
+Deprivation~~Blame
+'
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLM", se = "robust", auto.var = TRUE)
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLR", auto.var = TRUE)
+path_model <-'
+#measurement model
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+#Regressions
+Greed ~ Equality + Need + Equity + Deprivation + Blame
+'
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLR", auto.var = TRUE)
+path_model <-'
+#measurement model
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLR", auto.var = TRUE)
+m_model <- '
+#Define latent variables and indicators
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit1 = cfa(m_model, data = sem_data, estimator = "MLM", se = "robust")
+summary(fit1, fit.measures = TRUE)
+path_model <-' #Define latent variables and indicators
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+'
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLR", auto.var = TRUE)
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLR")
+fit2 = cfa(path_model, data = sem_data, estimator = "MLR")
+fit2 = cfa(path_model, data = sem_data, estimator = "MLR")
+fit2 = lavaan(path_model, data = sem_data, estimator = "MLR")
+fit2 = lavaan(path_model, data = sem_data)
+fit2 = lavaan(path_model, data = sem_data. auto.var=TRUE)
+fit2 = lavaan(path_model, data = sem_data, auto.var=TRUE)
+fit2 = sem(path_model, data = sem_data, auto.var=TRUE)
+fit2 = sem(path_model, data = sem_data, auto.var=TRUE, estimator = "MLM", se="robust")
+summary(fit2, fit.measures=TRUE)
+semPaths(fit2,"std",layout = 'circle', edge.label.cex=.9, curvePivot = TRUE)
+semPaths(fit2,"std",layout = 'tree', edge.label.cex=.9, curvePivot = TRUE)
+summary(fit2, fit.measures=TRUE, rsquare=TRUE)
+summary(fit2, fit.measures=TRUE, rsquare=TRUE)
+semPaths(fit2,"std",layout = 'spring', edge.label.cex=.9, curvePivot = TRUE)
+path_model <-'
+#Measurement model
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+#Regression
+Greed ~ Equality + Need + Equity + Deprivation + Blame
+'
+fit2 = sem(path_model, data = sem_data, auto.var=TRUE, estimator = "MLM", se="robust")
+summary(fit2, fit.measures=TRUE, rsquare=TRUE)
+semPaths(fit2,"std",layout = 'spring', edge.label.cex=.9, curvePivot = TRUE)
+path_model <-'
+#Measurement model
+Greed <~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+#Regression
+Greed ~ Equality + Need + Equity + Deprivation + Blame
+'
+fit2 = sem(path_model, data = sem_data, auto.var=TRUE, estimator = "MLM", se="robust")
+path_model <-'
+#Measurement model
+Greed =~ Dir1 + Dir 2 + Dir3 + Dir4 + Ind1 + Ind2 + Ind3 + Ind4
+Equality =~ Eq1 + Eq2
+Need =~ N1 + N2
+Equity =~ Des1 + Des2
+Deprivation =~ Dep1 + Dep2
+Blame =~ Bladir1 + Bladir2 + Bladir3
+#Regression
+Greed ~ Equality + Need + Equity + Deprivation + Blame
+'
+fit2 = sem(path_model, data = sem_data, auto.var=TRUE, estimator = "MLM", se="robust")
+summary(fit2, fit.measures=TRUE, rsquare=TRUE)
