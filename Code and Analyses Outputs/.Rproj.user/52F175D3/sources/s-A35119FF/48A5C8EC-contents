@@ -1,11 +1,10 @@
-#Title: "Title: "Consumer biases in the perception of organizational greed"
+#Title: "Consumer perceptions of organizational greed"
 
 #AUTHORS NAMES
 
-#In this script,  run a general linear model (ANCOVA) and test its assumptions.
+#In this script, we test normality, equality of variance assumptions and run a general linear model (ANCOVA)
 
 #This code was created using R version 4.1 and it's likely to break if previous versions are used to run it
-# This code is based on code at: https://www.datanovia.com/en/lessons/ancova-in-r/#:~:text=Homogeneity%20of%20regression%20slopes.,by%20groups%20should%20be%20parallel.
 
 
 
@@ -21,7 +20,6 @@ if(!require(statix)){install.packages("rstatix")}
 if(!require(tidyr)){install.packages("tidyr")}
 if(!require(emmeans)){install.packages("emmeans")}
 if(!require(broom)){install.packages("broom")}
-if(!require(ARTool)){install.packages("ARTool")}
 
 
 
@@ -37,58 +35,138 @@ library(rstatix)
 library(tidyr)
 library(emmeans)
 library(broom)
-library(ARTool)
 
 
 
-#Data upload and preparation
+
+#Data upload
 mains_data <- read.csv("Study1_GScores.csv")
-anc_data <- read.csv("Combined Scores.csv")
-
-#ASSUMPTIONS CHECK 
 
 
-# 1. Normality of residuals
+#1. Normality test
 
-# Fit  model
-model <- lm(Greed ~ Size*Group + Equality + Need +
-              Equity + Deprivation + Blame, data = anc_data)
-
-#Obtain residuals
-
-model.metrics <- augment(model) %>%
-  select(-.hat, -.sigma, -.fitted) # Remove details
-
-
-#a. Graph -residuals normality
-hist(model.metrics$.resid, col = "blue", 
-     main = "Residuals histogram",
-     xlab = "Residual value")
-
-# b. QQ plot
-qqnorm(model.metrics$.resid,
-       main = "Residuals QQ plot",
-       )  + abline(0,1)
-
-# c. Shapiro test
-shapiro_test(model.metrics$.resid)
+#a. Density plots for the different groups/cells - individual graphs
+ggplot(mains_data, 
+       aes(Score)) +
+       ggtitle("Density Plots Greed Scores by Group") +
+       theme(plot.title= element_text(hjust = 0.5)) +
+       geom_density(fill="green", alpha =.3) + 
+       labs (x= "Greed Score") + 
+       geom_vline(xintercept = 5, color= "blue", linetype = "dashed") + 
+       facet_grid(. ~ Group + Size)
 
 
-#Assumption of normality for ANCOVA violated. 
-#We then rely on the central limit theorem.
+# b. Density plots for the different groups - single graph
+#Data frame introduce new variable
+mains_data2<- transform(mains_data, 
+                     GroupandSize= paste(Group, Size))
+
+#Plot
+ggplot(mains_data2, 
+       aes(Score, fill= GroupandSize)) +
+       ggtitle("Density Plot Scores by Group") +
+       geom_density(alpha =.6) + 
+       labs (x= "Greed Score") + 
+       geom_vline(xintercept = 5, color= "blue", linetype = "dashed") + 
+       theme_dark() + 
+       theme(plot.title = element_text(hjust = 0.5)) 
+
+
+#c. q plot - single graphs
+qplot(sample = Score, 
+      data= mains_data2, 
+      shape=GroupandSize, 
+      color= GroupandSize) + 
+      labs(y= "Greed Score")
+
+#Shapiro-Wilk test
+
+#d. Summary stats per group
+tapply(mains_data2$Score, 
+       mains_data2$GroupandSize, 
+       summary)
+
+#e.Shapiro-Wilk tests by group
+#Data frame transform, drop unneccesary variables, reorganize data
+mains_data3 <- subset(mains_data2, 
+                   select =c(Score, GroupandSize))
+Dat <- data.table(mains_data3)
+
+#Test
+Dat[,
+   .(W = shapiro.test(Score)$statistic, 
+     P.value = shapiro.test(Score)$p.value),
+   by = .(GroupandSize)]
+
+
+#Assumption of normality for ANCOVA violated. We then rely on the central limit theorem.
 
 #2. Correlation between covariates
+
+#Load Data
+anc_data <- read.csv("Combined Scores.csv")
+head(anc_data)
 
 # Correlations matrix
 cor(anc_data[, c("Equality", "Need", "Equity", "Deprivation", "Blame")])
 
 
-#3. Homoscedasicity test residuals (Equality of variance)
+## Outliers. 
+
+cutoff = qchisq(1-.001, ncol(anc_data[, 4:9]))
+mahal = mahalanobis(anc_data[, 4:9],
+                    colMeans(anc_data[, 4:9], na.rm = T),
+                    cov(anc_data[, 4:9], use = "pairwise.complete.obs"))
+
+
+cutoff
+ncol(anc_data[, 4:9])
+summary(mahal < cutoff)
+noout = subset(anc_data, mahal<cutoff)
+
+noout
+
+
+#MODEL WITHOUT OUTLIERS
+model_no <- lm(Greed ~ Size*Group + Equality + Need + Equity + Deprivation + Blame,
+   data = noout)
+
+summary.aov(model_no)
+
+###
+
+#3. Homoscedasicity test (Equality of variance)
+
+# Fit the model
+model <- lm(Greed ~ Size*Group + Equality + Need +
+              Equity + Deprivation + Blame, data = noout)
+
+
+# Inspect the model diagnostic metrics
+
+
+#RESIDUALS, NORMALITY
+
+model.metrics <- augment(model) %>%
+  select(-.hat, -.sigma, -.fitted) # Remove details
+head(model.metrics, 3)
+
+shapiro_test(model.metrics$.resid)
+
+
+
+
+leveneTest(Greed ~ Size*Group, 
+           data = anc_data, 
+           center=mean)
 
 levene_test(.resid ~ Size*Group, data = model.metrics)
 
 
 #4. Linearity of the relationship between DV and covariates per group  
+
+
+?art
 
 # a. Equality and Greed
 ggscatter(
@@ -131,6 +209,7 @@ ggscatter(
   stat_smooth(method = "loess", span = 0.9)
 
 
+
 # 5. Homogeneity of regression slopes
 
 #a. Equality
@@ -159,6 +238,7 @@ anc_data %>%
   anova_test(Greed ~ sizeandgroup*Equality)
 
 
+
 # 6. ANCOVA
 
 # a. ANCOVA model: Factors: Size (Big vs Small) * Group (Small vs Big),
@@ -172,13 +252,6 @@ summary.aov(output)
 
  # c. etas
 etaSquared(output)
-
-#Aligned Rank Transformed Data
-
-ranked_model <- art(Greed ~ as.factor(Size) * as.factor(Group) 
-                    , data = anc_data)
-#Summary
-anova(ranked_model)
 
 
 #b. Interaction Plot
@@ -225,65 +298,5 @@ lp +
   )
 
 
-#Descriptives: Frequency Tables
 
-# 1. Gender
-#create frequency matrix
-gender <- matrix(c(53, 55, 61, 69, 76, 68, 61, 53), byrow=T, nrow=2)
-
-colnames(gender) <- c("Small-Local", "Small-Foreign", "Large-Local", "Large-Foreign")
-rownames(gender) <- c("Male", "Female")
-
-#Chi Square test
-gender_test<- chisq.test(gender)
-gender_test
-
-#2. Age 
-#Create frequency matrix
-age <- matrix(c(0, 9, 6, 8,
-                 42, 43, 30, 40,
-                 43, 33, 34, 34,
-                 21, 18, 29, 24,
-                 23, 20, 23, 16), byrow=T, 
-              nrow=5)
-colnames(age) <- c("Small-Local", "Small-Foreign", "Large-Local", "Large-Foreign")
-rownames(age) <- c("18-24", "25-34", "35-44", "45-54", "55+")
-
-#chi square test
-age_test <- chisq.test(age)
-age_test
-
-#3. Education 
-#Create frequency matrix
-education <- matrix(c(1, 0, 3, 0,
-                22, 30, 31, 28,
-                14, 18, 14, 13,
-                75, 62, 57, 62,
-                17, 13, 17, 19), byrow=T, 
-              nrow=5)
-
-colnames(education) <- c("Small-Local", "Small-Foreign", "Large-Local", "Large-Foreign")
-rownames(education) <- c("Less than high school", "High School", 
-                   "Technical/Diploma", "University degree", "Postgraduate")
-
-#chi square test
-education_test <- chisq.test(education)
-education_test
-
-#4. Income 
-#Create frequency matrix
-income <- matrix(c(23, 31, 31, 38,
-                      36, 38, 31, 25,
-                      53, 41, 47, 42,
-                      17, 13, 13, 17
-                      ), byrow=T, 
-                    nrow=4)
-
-colnames(income) <- c("Small-Local", "Small-Foreign", "Large-Local", "Large-Foreign")
-rownames(income) <- c("Less than 25k", "25k-<45k", 
-                         "45k-<85k", "85k+")
-
-#chi square test
-income_test <- chisq.test(income)
-income_test
 

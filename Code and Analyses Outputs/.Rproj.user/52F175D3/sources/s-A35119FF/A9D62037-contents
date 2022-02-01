@@ -1,11 +1,10 @@
-#Title: "Title: "Consumer biases in the perception of organizational greed"
+#Title: "Consumer perceptions of organizational greed"
 
 #AUTHORS NAMES
 
-#In this script,  run a general linear model (ANCOVA) and test its assumptions.
+#In this script, we test normality, equality of variance assumptions and run a general linear model (ANCOVA)
 
 #This code was created using R version 4.1 and it's likely to break if previous versions are used to run it
-# This code is based on code at: https://www.datanovia.com/en/lessons/ancova-in-r/#:~:text=Homogeneity%20of%20regression%20slopes.,by%20groups%20should%20be%20parallel.
 
 
 
@@ -21,7 +20,6 @@ if(!require(statix)){install.packages("rstatix")}
 if(!require(tidyr)){install.packages("tidyr")}
 if(!require(emmeans)){install.packages("emmeans")}
 if(!require(broom)){install.packages("broom")}
-if(!require(ARTool)){install.packages("ARTool")}
 
 
 
@@ -37,7 +35,7 @@ library(rstatix)
 library(tidyr)
 library(emmeans)
 library(broom)
-library(ARTool)
+
 
 
 
@@ -59,6 +57,7 @@ model <- lm(Greed ~ Size*Group + Equality + Need +
 model.metrics <- augment(model) %>%
   select(-.hat, -.sigma, -.fitted) # Remove details
 
+head(model.metrics)
 
 #a. Graph -residuals normality
 hist(model.metrics$.resid, col = "blue", 
@@ -225,65 +224,5 @@ lp +
   )
 
 
-#Descriptives: Frequency Tables
 
-# 1. Gender
-#create frequency matrix
-gender <- matrix(c(53, 55, 61, 69, 76, 68, 61, 53), byrow=T, nrow=2)
-
-colnames(gender) <- c("Small-Local", "Small-Foreign", "Large-Local", "Large-Foreign")
-rownames(gender) <- c("Male", "Female")
-
-#Chi Square test
-gender_test<- chisq.test(gender)
-gender_test
-
-#2. Age 
-#Create frequency matrix
-age <- matrix(c(0, 9, 6, 8,
-                 42, 43, 30, 40,
-                 43, 33, 34, 34,
-                 21, 18, 29, 24,
-                 23, 20, 23, 16), byrow=T, 
-              nrow=5)
-colnames(age) <- c("Small-Local", "Small-Foreign", "Large-Local", "Large-Foreign")
-rownames(age) <- c("18-24", "25-34", "35-44", "45-54", "55+")
-
-#chi square test
-age_test <- chisq.test(age)
-age_test
-
-#3. Education 
-#Create frequency matrix
-education <- matrix(c(1, 0, 3, 0,
-                22, 30, 31, 28,
-                14, 18, 14, 13,
-                75, 62, 57, 62,
-                17, 13, 17, 19), byrow=T, 
-              nrow=5)
-
-colnames(education) <- c("Small-Local", "Small-Foreign", "Large-Local", "Large-Foreign")
-rownames(education) <- c("Less than high school", "High School", 
-                   "Technical/Diploma", "University degree", "Postgraduate")
-
-#chi square test
-education_test <- chisq.test(education)
-education_test
-
-#4. Income 
-#Create frequency matrix
-income <- matrix(c(23, 31, 31, 38,
-                      36, 38, 31, 25,
-                      53, 41, 47, 42,
-                      17, 13, 13, 17
-                      ), byrow=T, 
-                    nrow=4)
-
-colnames(income) <- c("Small-Local", "Small-Foreign", "Large-Local", "Large-Foreign")
-rownames(income) <- c("Less than 25k", "25k-<45k", 
-                         "45k-<85k", "85k+")
-
-#chi square test
-income_test <- chisq.test(income)
-income_test
 

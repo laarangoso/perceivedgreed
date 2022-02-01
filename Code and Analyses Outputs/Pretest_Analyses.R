@@ -8,7 +8,7 @@
 if(!require(tidyverse)){install.packages("tidyverse")}
 if(!require(FSA)){install.packages("FSA")}
 
-library("tidyverse")
+library(tidyverse)
 library(data.table)
 library(ggpubr)
 library(FSA)
@@ -25,7 +25,7 @@ ggplot(pre_data, aes(Greed_Score)) +
        theme(plot.title = element_text(hjust = 0.5)) +
        geom_density(fill="green", alpha =.3) + 
        labs (x= "Total Greed Score") + 
-       geom_vline(xintercept = 40, color= "blue", linetype = "dashed") + 
+       geom_vline(xintercept = 5, color= "blue", linetype = "dashed") + 
        facet_grid(. ~ Scenario)
 
 # b. Density plots for the different groups - single graph
@@ -33,7 +33,7 @@ ggplot(pre_data, aes(Greed_Score, fill= Scenario)) +
       ggtitle("Density Plot Greed Scores by Scenario") +
       geom_density(alpha =.6) + 
       labs (x= "Total Greed Score") + 
-      geom_vline(xintercept = 40, color= "blue", linetype = "dashed") + 
+      geom_vline(xintercept = 5, color= "blue", linetype = "dashed") + 
       theme_dark() +
       theme(plot.title = element_text(hjust = 0.5))
 
