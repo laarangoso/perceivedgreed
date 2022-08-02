@@ -20,7 +20,7 @@ library(sjPlot)
 library(sjmisc)
 library(data.table)
 library(ARTool)
-
+library(ggplot2)
 
 
 #1. Distribution of greed scores
@@ -173,11 +173,9 @@ anova(ranked_model3)
 #e. Plot
 
 ggplot(anc_data3, aes(Group, Greed))+
-  geom_boxplot(aes(fill=Group)) + labs (y="Greed Score") + theme_bw() + 
+  geom_boxplot(aes(fill=Group), outlier.shape = NA) + labs (y="Greed Score") + theme_bw() + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   scale_fill_brewer(palette = "Pastel1") + ylim(4,7)
-
-
 
 
 #Descriptives: Frequency Tables
