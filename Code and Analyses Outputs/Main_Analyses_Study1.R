@@ -159,7 +159,7 @@ anc_data %>%
   anova_test(Greed ~ sizeandgroup*Equality)
 
 
-# 6. ANCOVA
+
 
 # a. ANCOVA model: Factors: Size (Big vs Small) * Group (Small vs Big),
 #Covariates: Equality, need, equity, deprivation and blame
