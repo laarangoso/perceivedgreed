@@ -1,8 +1,7 @@
-#Title: "Title: "Consumer biases in the perception of organizational greed"
-#AUTHORS NAMES
+#Title: "Consumer biases in the perception of Organizational Greed"
+#Arango, L., Singaraju, S., Niininen, O. & D'Souza, C.
 #In this script, we run a general linear model, one-way ANCOVA and test assumptions.
 #This code was created using R version 4.1 and it's likely to break if previous versions are used to run it
-# This code is based on code at: https://www.datanovia.com/en/lessons/ancova-in-r/#:~:text=Homogeneity%20of%20regression%20slopes.,by%20groups%20should%20be%20parallel.
 
 
 #Note: Sample is composed exclusively of American particpants.
@@ -235,4 +234,13 @@ rownames(income2) <- c("Less than 25k", "25k-<45k",
 income_test2 <- chisq.test(income2)
 income_test2
 
+#References
+
+# The code for the pretest, Study 1 CFA, and Studies 1, 2, and 3 is partly based on the following resources: 
+
+# 1.  Data carpentry contributors (2022) Data visualization with ggplot2. https://datacarpentry.org/R-ecology-lesson/04-visualization-ggplot2.html 
+#2. Gana, K. & Broc, G. (2019) Structural Equation Modelling with lavaan. Hoboken, NJ: Wiley.
+#3. Crowson, M. (2019) Path analysis in R using Lavaan (video 3): Assessing and managing multivariate nonnormality. [Video] YouTube. https://www.youtube.com/watch?v=HvYW_GeHpD8&t=347s 
+#4. Datanovia. (2018) ANCOVA in R. Comparing multiple means in R. https://www.datanovia.com/en/lessons/ancova-in-r/#:~:text=ANCOVA%20makes%20several%20assumptions%20about,Homogeneity%20of%20regression%20slopes
+#5. Gard, A. (2020) Chi-Squared Testing for Independence in R. [Video] YouTube (Equitable Equations channel).  https://www.youtube.com/watch?v=XfsDtYuwVzs 
 
